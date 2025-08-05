@@ -10,7 +10,7 @@ RSS_SOURCES = [
     'https://www.theverge.com/rss/index.xml',
     'https://feeds.arstechnica.com/arstechnica/index/'
 ]
-
+# Initialize the database connection
 conn = sqlite3.connect('news.db')
 cursor = conn.cursor()
 
