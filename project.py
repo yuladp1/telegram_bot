@@ -3,13 +3,17 @@ import feedparser
 import sqlite3
 import html
 from telegram import Bot
-from config import TOKEN, CHANNEL_ID
-
+#from config import TOKEN, CHANNEL_ID
+import os
+# Define the RSS sources
 RSS_SOURCES = [
     'https://techcrunch.com/feed/',
     'https://www.theverge.com/rss/index.xml',
     'https://feeds.arstechnica.com/arstechnica/index/'
 ]
+
+TOKEN = os.getenv("TELEGRAM_TOKEN")
+CHANNEL_ID = os.getenv("CHANNEL_ID")
 # Initialize the database connection
 conn = sqlite3.connect('news.db')
 cursor = conn.cursor()
