@@ -12,7 +12,7 @@ RSS_SOURCES = [
     'https://feeds.arstechnica.com/arstechnica/index/'
 ]
 
-TOKEN = os.getenv("TELEGRAM_TOKEN")
+TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 CHANNEL_ID = os.getenv("CHANNEL_ID")
 # Initialize the database connection
 conn = sqlite3.connect('news.db')
@@ -54,7 +54,7 @@ def get_latest_news():
     return None
 
 async def send_to_telegram(message):
-    bot = Bot(token=TOKEN)
+    bot = Bot(token=TELEGRAM_TOKEN)
     await bot.send_message(chat_id=CHANNEL_ID, text=message)
 
 if __name__ == "__main__":
