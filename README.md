@@ -1,80 +1,63 @@
-# Tech News Telegram Bot
+# TechDigestBotR 🤖
 
-You can interact with the bot directly via Telegram: [TechDigestBotR](https://t.me/TechDigestBotR)
-
-This Telegram bot automatically fetches technology news from multiple RSS feeds and posts them to a Telegram channel on a schedule. The goal is to provide concise, fresh tech news updates 1-2 times per day.
-
----
+A Telegram bot that automatically collects and publishes the latest technology news to the [TechDigestBotR](https://t.me/TechDigestBotR) channel.
 
 ## Features
 
-- Automatically fetches news from several tech RSS sources.
-- Parses and shortens news content for Telegram-friendly posts.
-- Avoids duplicate posts by storing published news in an SQLite database.
-- Scheduled posting on weekdays and weekends at specific times.
-- Simple setup with configuration separated into a `config.py` file.
+- Aggregates news from selected technology sources:
+  - TechCrunch
+  - The Verge
+  - Ars Technica
+- Uses a local SQLite database to prevent posting duplicate news
+- Processes RSS feeds and selects only the most recent unpublished articles
+- Publishes clean article titles and descriptions without promotional inserts
+- Runs automatically on a defined schedule via **GitHub Actions**:
+  - Weekdays — morning and evening
+  - Weekends — midday
 
----
+## How It Works
 
-## News Sources
+1. **News Parsing** — The bot fetches the latest articles from predefined RSS feeds.
+2. **Duplicate Check** — Each article is compared with stored entries in the SQLite database to ensure it is not reposted.
+3. **Publishing** — If the article is new, it is posted to the Telegram channel.
 
-- [TechCrunch](https://techcrunch.com/feed/)
-- [The Verge](https://www.theverge.com/rss/index.xml)
-- [ArsTechnica](http://feeds.arstechnica.com/arstechnica/index)
+## Running the Bot
 
----
+### Local Execution
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yuladp1/telegram_bot.git
+   cd telegram_bot
+2. Create and configure config.py:
 
-## Posting Schedule
+TOKEN = "your_bot_token"
+CHANNEL_ID = "@your_channel_username"
+3. Install dependencies:
 
-- Weekdays (Monday to Friday): 9:00 AM and 7:00 PM
-- Weekends (Saturday and Sunday): 12:00 PM
+pip install -r requirements.txt
+4. Run:
+python project.py
 
----
+## Automated Deployment via GitHub Actions
+Go to your repository settings on GitHub:
+Settings → Secrets and variables → Actions
 
-## How the bot selects news for posting
+Add the following secrets:
 
-1. The bot fetches all fresh news from the configured RSS sources.
+TELEGRAM_TOKEN — Bot token obtained from BotFather
 
-2. It filters out the news that have already been published (checking against the SQLite database).
+CHANNEL_ID — Channel ID or @username
 
-3. It picks the first news item from the list (RSS feeds usually provide news in order from newest to oldest).
+The bot will be executed automatically according to the schedule defined in .github/workflows/news_bot.yml.
 
-4. This way, the bot publishes the freshest news that has not been posted before.
+## Manual Run with GitHub Actions
+To test the bot without waiting for the scheduled time:
 
----
+Go to your repository on GitHub.
 
-## How to Run
+Navigate to Actions.
 
-1. Install required packages listed in `requirements.txt`.
+Select the workflow testdeploy.yml and click Run workflow.
 
-2. Create and configure `config.py` with your Telegram bot token and channel ID.
-```python
-# config.py
-
-# Telegram bot token from BotFather
-TOKEN = "YOUR_BOT_TOKEN"
-
-# Telegram channel ID (for public channels use @channelusername, 
-# for private channels use numeric ID starting with -100)
-CHANNEL_ID = -100XXXXXXXXXX
-
-3. Run the main script to test posting manually or run it as a scheduled job.
-
----
-
-## Project Structure
-
-- `project.py` — main bot script
-- `config.py` — configuration file with bot token and channel ID (excluded from Git)
-- `requirements.txt` — list of Python dependencies
-- `news.db` — SQLite database file created at runtime
-
----
-
-## Notes
-
-- The bot posts one news item per scheduled run.
-- You can expand the sources or customize the post formatting.
-- Use SQLite database for persistence of published news to avoid duplicates.
-
----
+Links
+Telegram channel: TechDigestBotR

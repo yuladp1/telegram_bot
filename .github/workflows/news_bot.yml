@@ -1,10 +1,13 @@
 name: Telegram News Bot
 
 on:
-  schedule:
-    # Запуск 9:00 и 19:00 UTC (если нужно — поправь на свой часовой пояс)
-    - cron: '0 9,19 * * 1-5'  # Будние дни 9:00 и 19:00 UTC
-    - cron: '0 12 * * 6,0'    # Выходные 12:00 UTC (суббота и воскресенье)
+schedule:
+  # Weekdays at 09:00 and 19:00 Poland time
+  - cron: '0 9,19 * * 1-5'
+    timezone: 'Europe/Warsaw'
+  # Weekends at 12:00 Poland time
+  - cron: '0 12 * * 6,0'
+    timezone: 'Europe/Warsaw'
 
 jobs:
   run-bot:
