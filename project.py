@@ -76,12 +76,10 @@ def get_latest_news():
 
 async def send_to_telegram(message):
     bot = Bot(token=TELEGRAM_TOKEN)
-    await bot.send_message(chat_id=CHANNEL_ID, text=message)
+    await bot.send_message(chat_id=CHANNEL_ID, text=message, parse_mode="HTML")
 
 if __name__ == "__main__":
     news = get_latest_news()
     if news:
         asyncio.run(send_to_telegram(news))
-    else:
-        print("No new news to post.")
     conn.close()
