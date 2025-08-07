@@ -32,46 +32,37 @@ def clean_html(raw_html):
     cleantext = re.sub(cleanr, '', raw_html)
     return html.unescape(cleantext).strip()
 
+
 def get_latest_news():
-    # Shuffle the RSS sources to check them in random order
     random_sources = random.sample(RSS_SOURCES, len(RSS_SOURCES))
 
-    # Iterate through each RSS source
     for source in random_sources:
-        # Parse the RSS feed
         feed = feedparser.parse(source)
         if not feed.entries:
-            continue  # Skip if the feed is empty
+            continue
 
-        # Get the most recent news entry
         entry = sorted(feed.entries, key=lambda e: e.get("published_parsed", None), reverse=True)[0]
-        news_id = entry.link  # Use the link as a unique ID
+        news_id = entry.link
 
-        # Check if the news has already been posted
+        print(f"Checking news id: {news_id} from source: {source}")
+
         cursor.execute("SELECT id FROM posted_news WHERE id = ?", (news_id,))
         if cursor.fetchone() is None:
-            # News is new — insert it into the database
+            print("New news found, inserting into DB.")
             cursor.execute("INSERT INTO posted_news (id) VALUES (?)", (news_id,))
             conn.commit()
 
-            # Extract title, link, and clean description
             title = entry.title
             link = entry.link
             description = clean_html(entry.get("summary", ""))
 
-            # Special handling for TechCrunch descriptions
-            if "TechCrunch" in source and description.startswith("Welcome back to TechCrunch"):
-                description = ". ".join(description.split(".")[1:]).strip()
-
-              # Clean unwanted characters
             description = description.replace("[…]", "").strip()
 
-            # Format message: bold title (HTML), then description, then link
             news_item = f"<b>{title}</b>\n\n{description}\n\n{link}"
-                        # Return a single string instead of a list
             return news_item
+        else:
+            print("News already posted, skipping.")
 
-    # No new news found in any source
     return None
 
 async def send_to_telegram(message):
