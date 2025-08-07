@@ -64,29 +64,14 @@ def get_latest_news():
                 description = ". ".join(description.split(".")[1:]).strip()
 
             # Clean unwanted characters
-            description = description.replac
+            description = description.replace("[…]", "").strip()
 
-    news_items = []
-    for source in RSS_SOURCES:
-        feed = feedparser.parse(source)
-        for entry in feed.entries:
-            news_id = entry.link
-            cursor.execute("SELECT id FROM posted_news WHERE id = ?", (news_id,))
-            if cursor.fetchone() is None:
-                cursor.execute("INSERT INTO posted_news (id) VALUES (?)", (news_id,))
-                conn.commit()
+            # Return the news item in the desired format
+            news_item = f"{title}\n\n{description}\n\n{link}"
+            return [news_item]
 
-                title = entry.title
-                link = entry.link
-                description = clean_html(entry.get("summary", ""))
-
-                if "TechCrunch" in source and description.startswith("Welcome back to TechCrunch"):
-                    description = ". ".join(description.split(".")[1:]).strip()
-
-                description = description.replace("[…]", "").strip()
-
-                news_items.append(f"{title}\n\n{description}\n\n{link}")
-    return news_items if news_items else None
+    # No new news found in any source
+    return None
 
 async def send_to_telegram(message):
     bot = Bot(token=TELEGRAM_TOKEN)
