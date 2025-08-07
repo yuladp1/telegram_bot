@@ -21,4 +21,10 @@ jobs:
       env:
         TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
         CHANNEL_ID: ${{ secrets.CHANNEL_ID }}
-
+     - name: Commit changes to database
+      run: |
+        git config --global user.name "github-actions"
+        git config --global user.email "github-actions@github.com"
+        git add news.db
+        git commit -m "Update news.db [skip ci]" || echo "No changes to commit"
+        git push
