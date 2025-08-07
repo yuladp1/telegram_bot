@@ -63,12 +63,13 @@ def get_latest_news():
             if "TechCrunch" in source and description.startswith("Welcome back to TechCrunch"):
                 description = ". ".join(description.split(".")[1:]).strip()
 
-            # Clean unwanted characters
+              # Clean unwanted characters
             description = description.replace("[…]", "").strip()
 
-            # Return the news item in the desired format
-            news_item = f"{title}\n\n{description}\n\n{link}"
-            return [news_item]
+            # Format message: bold title (HTML), then description, then link
+            news_item = f"<b>{title}</b>\n\n{description}\n\n{link}"
+                        # Return a single string instead of a list
+            return news_item
 
     # No new news found in any source
     return None
