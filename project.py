@@ -2,6 +2,7 @@ import asyncio
 import feedparser
 import sqlite3
 import html
+import hashlib
 from telegram import Bot
 #from config import TOKEN, CHANNEL_ID
 import os
@@ -32,6 +33,9 @@ def clean_html(raw_html):
     cleantext = re.sub(cleanr, '', raw_html)
     return html.unescape(cleantext).strip()
 
+def hash_entry(entry):
+    base = entry.get("id") or entry.get("link") or entry.get("title")
+    return hashlib.sha256(base.encode("utf-8")).hexdigest()
 
 def get_latest_news():
     random_sources = random.sample(RSS_SOURCES, len(RSS_SOURCES))
@@ -42,26 +46,29 @@ def get_latest_news():
             continue
 
         entry = sorted(feed.entries, key=lambda e: e.get("published_parsed", None), reverse=True)[0]
-        news_id = entry.link
+        news_id = hash_entry(entry)
 
-        print(f"Checking news id: {news_id} from source: {source}")
+        print(f"Checking hashed ID: {news_id}")
 
         cursor.execute("SELECT id FROM posted_news WHERE id = ?", (news_id,))
         if cursor.fetchone() is None:
-            print("New news found, inserting into DB.")
-            cursor.execute("INSERT INTO posted_news (id) VALUES (?)", (news_id,))
-            conn.commit()
+            print("New news. Inserting...")
+
+            try:
+                cursor.execute("INSERT INTO posted_news (id) VALUES (?)", (news_id,))
+                conn.commit()
+            except sqlite3.IntegrityError as e:
+                print(f"DB error: {e}")
+                continue  # Skip on error
 
             title = entry.title
             link = entry.link
-            description = clean_html(entry.get("summary", ""))
-
-            description = description.replace("[…]", "").strip()
+            description = clean_html(entry.get("summary", "")).replace("[…]", "").strip()
 
             news_item = f"<b>{title}</b>\n\n{description}\n\n{link}"
             return news_item
         else:
-            print("News already posted, skipping.")
+            print("Already posted.")
 
     return None
 
